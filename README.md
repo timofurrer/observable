@@ -67,10 +67,10 @@ Remove a handler from a specified event:
 obs.remove_handler("error", error_func)
 ```
 
-Remove all handler from a specified event:
+Remove all handlers from a specified event:
 
 ```python
-obs.clear_event("error")
+obs.clear_handlers("error")
 ```
 
 Clear all events:
