@@ -24,23 +24,29 @@ and install it with:
 ## How to use
 Import it with the following statement in your own program
 
-    from observable import Observable
+```python
+from observable import Observable
 
-    obs = Observable()
+obs = Observable()
+```
 
 ### Register event handler with `on`
 There are two ways to register a function to an event.<br />
 The first way is to register the event with a decorator like this:
 
-    @obs.on("error")
-    def error_func(message):
-        print("Error: %s" % message)
+```python
+@obs.on("error")
+def error_func(message):
+    print("Error: %s" % message)
+```
 
 The second way is to register it with a method call:
 
-    def error_func(message):
-        print("Error: %s" % message)
-    obs.on("error", error_func)
+```python
+def error_func(message):
+    print("Error: %s" % message)
+obs.on("error", error_func)
+```
 
 ### Register event handler with `once`
 `once` works like `on`, but once the event handler is triggered it will be removed and cannot be triggered again.
@@ -48,19 +54,27 @@ The second way is to register it with a method call:
 ### trigger event
 You can trigger a registered event with the `trigger` method:
 
-    obs.trigger("error", "This is my error message")
+```python
+obs.trigger("error", "This is my error message")
+```
 
 If no handler for the event `error` could be found an `Observable.NoHandlerFound`-Exception will be raised.
 
 ### remove handler and events
 Remove a handler from a specified event:
 
-    obs.remove_handler("error", error_func)
+```python
+obs.remove_handler("error", error_func)
+```
 
 Remove all handler from a specified event:
 
-    obs.clear_event("error")
+```python
+obs.clear_event("error")
+```
 
 Clear all events:
 
-    obs.clear_events()
+```python
+obs.clear_events()
+```
