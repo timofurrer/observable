@@ -4,7 +4,7 @@
 
 ***
 
-For this module I was inspired by https://github.com/js-coder/observable.<br /><br/>
+Writing this module was an inspiration by https://github.com/js-coder/observable.<br /><br/>
 
 **Author:** Timo Furrer<br />
 **Email:** tuxtimo@gmail.com<br />
