@@ -20,6 +20,27 @@ and install it with:
 
 *Note: you may need root privileges to execute setup.py*
 
+### with `make`
+
+When you have cloned the repository you can install it with
+
+    sudo make install
+
+If you want to install just if all nose tests are passing
+
+    sudo make
+
+## nose tests
+
+There are some `nose` tests in the `test/` directory. <br />
+If you haven't installed `nose` yet - do it with
+
+    sudo pip install nose
+
+After you've `nose` installed - test `pyobservable` with:
+
+    make tests
+
 ## How to use
 Import it with the following statement in your own program
 
