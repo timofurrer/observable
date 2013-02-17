@@ -6,8 +6,7 @@
 
 Writing this module was an inspiration by https://github.com/js-coder/observable.<br /><br/>
 
-**Author:** Timo Furrer<br />
-**Email:** tuxtimo@gmail.com<br />
+**Author:** Timo Furrer <tuxtimo@gmail.com><br />
 **Version:** 0.00.01<br />
 
 ## How to install
@@ -30,7 +29,7 @@ from observable import Observable
 obs = Observable()
 ```
 
-### Register event handler with `on`
+### `on`: Register event handler with `on`
 There are two ways to register a function to an event.<br />
 The first way is to register the event with a decorator like this:
 
@@ -48,10 +47,10 @@ def error_func(message):
 obs.on("error", error_func)
 ```
 
-### Register event handler with `once`
+### `once`: Register event handler with `once`
 `once` works like `on`, but once the event handler is triggered it will be removed and cannot be triggered again.
 
-### trigger event
+### `trigger`: trigger event
 You can trigger a registered event with the `trigger` method:
 
 ```python
@@ -60,21 +59,25 @@ obs.trigger("error", "This is my error message")
 
 If no handler for the event `error` could be found an `Observable.NoHandlerFound`-Exception will be raised.
 
-### remove handler and events
+### `off`: remove handler and events
 Remove a handler from a specified event:
 
 ```python
-obs.remove_handler("error", error_func)
+obs.off("error", error_func)
+```
+
+```python
+obs.off("error", [error_func, second_error_func])
 ```
 
 Remove all handlers from a specified event:
 
 ```python
-obs.clear_handlers("error")
+obs.off("error")
 ```
 
 Clear all events:
 
 ```python
-obs.clear_events()
+obs.off()
 ```

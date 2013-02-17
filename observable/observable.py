@@ -34,7 +34,7 @@ class Observable:
         def _once_wrapper(func):
             def _wrapper(*args, **kwargs):
                 func(*args, **kwargs)
-                self.remove_handler(event, _wrapper)
+                self.off(event, _wrapper)
             return _wrapper
 
         if func:
@@ -42,23 +42,20 @@ class Observable:
         else:
             return lambda func: self.on(event, _once_wrapper(func))
 
-    def remove_handler(self, event, func):
-        """remove a handler from a specified event"""
+    def off(self, event=None, func=None):
+        """unregister an event or handler from an event"""
+        if not event:
+            self._events = {}
+            return True
         if event not in self._events:
             raise Observable.EventNotFound(event)
-        if func not in self._events[event]:
-            raise Observable.NoHandlerFound(event)
-        self._events[event].remove(func)
-
-    def clear_handlers(self, event):
-        """remove all handlers from a specified event"""
-        if event not in self._events:
-            raise Observable.EventNotFound(event)
-        self._events[event] = []
-
-    def clear_events(self):
-        """remove all events and thier handlers"""
-        self._events = {}
+        if not func:
+            self._events[event] = []
+            return True
+        if not isinstance(func, list):
+            func = [func]
+        for f in func:
+            self._events[event].remove(f)
 
     def trigger(self, event, *args, **kwargs):
         """trigger all functions from an event"""
