@@ -4,14 +4,14 @@
 class Observable:
     """event system for python"""
     class EventNotFound(Exception):
-        """Raised if event was not found"""
+        """Raised if an event was not found"""
         def __init__(self, event):
             Exception.__init__(self, "Event '%s' was not found" % event)
 
-    class NoHandlerFound(Exception):
-        """Raised if no handler for event was found"""
-        def __init__(self, event):
-            Exception.__init__(self, "No handler for event '%s' found" % event)
+    class HandlerNotFound(Exception):
+        """Raised if an handler was not found"""
+        def __init__(self, event, handler):
+            Exception.__init__(self, "Handler '%s' was not found for event '%s'" % (event, handler))
 
     def __init__(self):
         self._events = {}
@@ -55,6 +55,8 @@ class Observable:
         if not isinstance(func, list):
             func = [func]
         for f in func:
+            if f not in self._events[event]:
+                raise Observable.HanlderNotFound(event, f.func_name)
             self._events[event].remove(f)
 
     def trigger(self, event, *args, **kwargs):
