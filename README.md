@@ -41,6 +41,29 @@ After you've `nose` installed - test `pyobservable` with:
 
     make tests
 
+The output should be something like:
+
+    nosetests -v
+    test event registering with the on decorator ... ok
+    test event registering with the on method ... ok
+    test event registering with the once decorator ... ok
+    test event registering with the once method ... ok
+    test event triggering with event registered with on ... ok
+    test event triggering with event registered with once ... ok
+    test exception raising for not existing events ... ok
+    test obs.off method ... ok
+    test exception raising in the off method ... ok
+    test event triggering with arguments ... ok
+    test event triggering with argument list ... ok
+    test event triggering with keyword-arguments ... ok
+
+    ----------------------------------------------------------------------
+    Ran 12 tests in 0.003s
+
+    OK
+
+... where just the last `OK` is important!
+
 ## How to use
 Import it with the following statement in your own program
 
