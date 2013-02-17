@@ -56,7 +56,7 @@ class Observable:
             func = [func]
         for f in func:
             if f not in self._events[event]:
-                raise Observable.HanlderNotFound(event, f.func_name)
+                raise Observable.HandlerNotFound(event, f.func_name)
             self._events[event].remove(f)
 
     def trigger(self, event, *args, **kwargs):
