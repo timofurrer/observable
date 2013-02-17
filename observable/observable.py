@@ -3,6 +3,11 @@
 
 class Observable:
     """event system for python"""
+    class EventNotFound(Exception):
+        """Raised if event was not found"""
+        def __init__(self, event):
+            Exception.__init__(self, "Event '%s' was not found" % event)
+
     class NoHandlerFound(Exception):
         """Raised if no handler for event was found"""
         def __init__(self, event):
@@ -40,13 +45,15 @@ class Observable:
     def remove_handler(self, event, func):
         """remove a handler from a specified event"""
         if event not in self._events:
+            raise Observable.EventNotFound(event)
+        if func not in self._events[event]:
             raise Observable.NoHandlerFound(event)
         self._events[event].remove(func)
 
     def clear_handlers(self, event):
         """remove all handlers from a specified event"""
         if event not in self._events:
-            raise Observable.NoHandlerFound(event)
+            raise Observable.EventNotFound(event)
         self._events[event] = []
 
     def clear_events(self):
@@ -56,7 +63,7 @@ class Observable:
     def trigger(self, event, *args, **kwargs):
         """trigger all functions from an event"""
         if event not in self._events:
-            raise Observable.NoHandlerFound(event)
+            raise Observable.EventNotFound(event)
 
         handled = False
         for func in self._events[event]:
