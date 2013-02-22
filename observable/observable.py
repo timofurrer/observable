@@ -16,6 +16,11 @@ class Observable:
     def __init__(self):
         self._events = {}
 
+    def register_event(self, event):
+        """register an event if it does not exist yet"""
+        if event not in self._events:
+            self._events[event] = {}
+
     def on(self, event, func=None):
         """register a handler to a specified event"""
         def _on_wrapper(func):
