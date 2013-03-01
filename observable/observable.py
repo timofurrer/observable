@@ -67,7 +67,7 @@ class Observable:
     def trigger(self, event, *args, **kwargs):
         """trigger all functions from an event"""
         if event not in self._events:
-            raise Observable.EventNotFound(event)
+            return False
 
         handled = False
         for func in self._events[event]:
