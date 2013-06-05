@@ -91,7 +91,8 @@ def test_no_event_for_trigger():
     obs = Observable()
     nose.assert_equals(obs._events, {})
 
-    nose.assert_raises(Observable.EventNotFound, obs.trigger, "no_existing_event")
+    nose.assert_false(obs.trigger("no_existing_event"))
+    nose.assert_raises(Observable.EventNotFound, obs.off, "no_existing_event")
 
 
 def test_off():
