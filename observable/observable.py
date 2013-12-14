@@ -1,76 +1,86 @@
-# -*- coding: utf-8 -*-
+from collections import defaultdict
 
 
-class Observable:
+class HandlerNotFound(Exception):
+    """Raised if an handler was not found"""
+
+    def __init__(self, event, handler):
+        super(HandlerNotFound, self).__init__(
+            "Handler '%s' was not found for event '%s'" % (event, handler))
+
+
+class EventNotFound(Exception):
+    """Raised if an event was not found"""
+
+    def __init__(self, event):
+        super(EventNotFound, self).__init__("Event '%s' was not found" % event)
+
+
+class Observable(object):
     """event system for python"""
-    class EventNotFound(Exception):
-        """Raised if an event was not found"""
-        def __init__(self, event):
-            Exception.__init__(self, "Event '%s' was not found" % event)
 
-    class HandlerNotFound(Exception):
-        """Raised if an handler was not found"""
-        def __init__(self, event, handler):
-            Exception.__init__(self, "Handler '%s' was not found for event '%s'" % (event, handler))
+    HandlerNotFound = HandlerNotFound # backward compatibiliy
+    EventNotFound = EventNotFound # backward compatibiliy
 
-    def __init__(self):
-        self._events = {}
-
-    def register_event(self, event):
-        """register an event if it does not exist yet"""
-        if event not in self._events:
-            self._events[event] = {}
-
-    def on(self, event, func=None):
+    def on(self, event, *handlers):
         """register a handler to a specified event"""
-        def _on_wrapper(func):
-            if event not in self._events:
-                self._events[event] = []
-            self._events[event].append(func)
-            return func
 
-        if func:
-            return _on_wrapper(func)
-        else:
-            return _on_wrapper
+        def _on_wrapper(*handlers):
+            self.events[event]+=handlers
+            return handlers[0]
 
-    def once(self, event, func=None):
+        if handlers:
+            return _on_wrapper(*handlers)
+        return _on_wrapper
+
+    def off(self, event=None, *handlers):
+        """unregister an event or handler from an event"""
+
+        if not event:
+            self.events.clear()
+            return True
+
+        if not event in self.events:
+            raise EventNotFound(event)
+
+        if not handlers:
+            self.events.pop(event, None)
+            return True
+
+        for callback in handlers:
+            if not callback in self.events[event]:
+                raise HandlerNotFound(event, callback)
+            while callback in self.events[event]:
+                self.events[event].remove(callback)
+        return True
+
+    def once(self, event, *handlers):
         """register a handler to a specified event, but remove it when it is triggered"""
-        def _once_wrapper(func):
-            def _wrapper(*args, **kwargs):
-                func(*args, **kwargs)
+
+        def _once_wrapper(*handlers):
+            def _wrapper(*args, **kw):
+                map(lambda x: x(*args, **kw), handlers)
                 self.off(event, _wrapper)
             return _wrapper
 
-        if func:
-            return self.on(event, _once_wrapper(func))
-        else:
-            return lambda func: self.on(event, _once_wrapper(func))
+        if handlers:
+            return self.on(event, _once_wrapper(*handlers))
+        return lambda x: self.on(event, _once_wrapper(x))
 
-    def off(self, event=None, func=None):
-        """unregister an event or handler from an event"""
-        if not event:
-            self._events = {}
-            return True
-        if event not in self._events:
-            raise Observable.EventNotFound(event)
-        if not func:
-            self._events[event] = []
-            return True
-        if not isinstance(func, list):
-            func = [func]
-        for f in func:
-            if f not in self._events[event]:
-                raise Observable.HandlerNotFound(event, f.func_name)
-            self._events[event].remove(f)
-
-    def trigger(self, event, *args, **kwargs):
+    def trigger(self, event, *args, **kw):
         """trigger all functions from an event"""
-        if event not in self._events:
-            return False
 
-        handled = False
-        for func in self._events[event]:
-            func(*args, **kwargs)
-            handled = True
-        return handled
+        if not event in self.events or not self.events[event]:
+            return False
+        map(lambda x: x(*args, **kw), self.events[event])
+        return True
+
+    @property
+    def events(self):
+        try:
+            return self._events
+        except AttributeError:
+            self._events = defaultdict(list)
+        return self._events
+
+
