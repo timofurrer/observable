@@ -210,6 +210,29 @@ def test_on_multiple_handlers():
     nose.assert_equals(results, [1,2])
 
 
+def test_off_multiple_handlers():
+    """test event unregistering with the off method and multiple handlers"""
+
+    obs = Observable()
+    nose.assert_false(obs.events)
+
+    results = []
+
+    def some_test(*args, **kw):
+        results.append(1)
+
+    def some_test_2(*args, **kw):
+        results.append(2)
+
+    obs.on('some_test', some_test, some_test_2)
+    nose.assert_equals(len(obs.events['some_test']), 2)
+
+    obs.off('some_test', some_test, some_test_2)
+    nose.assert_equals(len(obs.events['some_test']), 0)
+
+    nose.assert_false(obs.trigger('some_test'))
+
+
 def test_multiple_inheritance():
     """Test using class inheritance without calling Observable.__init__"""
 
