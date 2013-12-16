@@ -1,13 +1,13 @@
 # pyobservable
 > observable module for python
-> *Version: 0.00.01*
+> *Version: 0.01.00*
 
 ***
 
 Writing this module was an inspiration by https://github.com/js-coder/observable.<br /><br/>
 
 **Author:** Timo Furrer <tuxtimo@gmail.com><br />
-**Version:** 0.00.01<br />
+**Version:** 0.01.00<br />
 
 ## How to install
 Just clone this repository with:
