@@ -10,13 +10,21 @@ Writing this module was an inspiration by https://github.com/js-coder/observable
 **Version:** 0.01.00<br />
 
 ## How to install
+
+### Install with PIP
+
+    pip install observable
+
+*Note: you may need root privileges to install*
+
+### Install from source
 Just clone this repository with:
 
-    $ git clone https://github.com/timofurrer/pyobservable.git
+    git clone https://github.com/timofurrer/pyobservable.git
 
 and install it with:
 
-    # python setup.py install
+    python setup.py install
 
 *Note: you may need root privileges to execute setup.py*
 
