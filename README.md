@@ -4,73 +4,10 @@
 
 ***
 
-Writing this module was an inspiration by https://github.com/js-coder/observable.<br /><br/>
-
 **Author:** Timo Furrer <tuxtimo@gmail.com><br />
 **Version:** 0.01.00<br />
 
-## How to install
-
-### Install with PIP
-
-    pip install observable
-
-*Note: you may need root privileges to install*
-
-### Install from source
-Just clone this repository with:
-
-    git clone https://github.com/timofurrer/pyobservable.git
-
-and install it with:
-
-    python setup.py install
-
-*Note: you may need root privileges to execute setup.py*
-
-### with `make`
-
-When you have cloned the repository you can install it with
-
-    sudo make install
-
-If you want to install just if all nose tests are passing
-
-    sudo make
-
-## nose tests
-
-There are some `nose` tests in the `test/` directory. <br />
-If you haven't installed `nose` yet - do it with
-
-    sudo pip install nose
-
-After you've `nose` installed - test `pyobservable` with:
-
-    make tests
-
-The output should be something like:
-
-    nosetests -v
-    test event registering with the on decorator ... ok
-    test event registering with the on method ... ok
-    test event registering with the once decorator ... ok
-    test event registering with the once method ... ok
-    test event triggering with event registered with on ... ok
-    test event triggering with event registered with once ... ok
-    test exception raising for not existing events ... ok
-    test obs.off method ... ok
-    test exception raising in the off method ... ok
-    test event triggering with arguments ... ok
-    test event triggering with argument list ... ok
-    test event triggering with keyword-arguments ... ok
-
-    ----------------------------------------------------------------------
-    Ran 12 tests in 0.003s
-
-    OK
-
-... where just the last `OK` is important!
+`pyobservable` is a module purely written in python. It is an event system - This means you can register events and trigger them somewhere else.
 
 ## How to use
 Import it with the following statement in your own program
@@ -133,3 +70,74 @@ Clear all events:
 ```python
 obs.off()
 ```
+
+## How to install
+
+### Install with PIP
+
+    pip install observable
+
+*Note: you may need root privileges to install*
+
+### Install from source
+Just clone this repository with:
+
+    git clone https://github.com/timofurrer/pyobservable.git
+
+and install it with:
+
+    python setup.py install
+
+*Note: you may need root privileges to execute setup.py*
+
+### with `make`
+
+When you have cloned the repository you can install it with
+
+    sudo make install
+
+If you want to install just if all nose tests are passing
+
+    sudo make
+
+## Contribution
+Feel free to contribute!
+
+### nose tests
+
+There are some `nose` tests in the `test/` directory. <br />
+If you haven't installed `nose` yet - do it with
+
+    sudo pip install nose
+
+After you've `nose` installed - test `pyobservable` with:
+
+    make tests
+
+The output should be something like:
+
+    nosetests -v
+    test event registering with the on decorator ... ok
+    test event registering with the on method ... ok
+    test event registering with the once decorator ... ok
+    test event registering with the once method ... ok
+    test event triggering with event registered with on ... ok
+    test event triggering with event registered with once ... ok
+    test exception raising for not existing events ... ok
+    test obs.off method ... ok
+    test exception raising in the off method ... ok
+    test event triggering with arguments ... ok
+    test event triggering with argument list ... ok
+    test event triggering with keyword-arguments ... ok
+
+    ----------------------------------------------------------------------
+    Ran 12 tests in 0.003s
+
+    OK
+
+... where just the last `OK` is important!
+
+
+## Inspiration
+Writing this module was an inspiration by https://github.com/js-coder/observable.<br /><br/>
+
