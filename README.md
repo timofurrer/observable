@@ -2,6 +2,8 @@
 > observable module for python
 > *Version: 0.01.00*
 
+[![Build Status](https://travis-ci.org/timofurrer/pyobservable.svg)](https://travis-ci.org/timofurrer/pyobservable)
+
 ***
 
 **Author:** Timo Furrer <tuxtimo@gmail.com><br />
