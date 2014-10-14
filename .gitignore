@@ -6,3 +6,6 @@
 
 # distutils
 build
+
+# virtualenv
+env

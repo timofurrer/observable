@@ -1,7 +1,7 @@
 all: tests install
 
 install:
-	python setup.py install
+	pip install .
 tests:
 	nosetests -v
 readme:
