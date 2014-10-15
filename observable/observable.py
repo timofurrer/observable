@@ -19,14 +19,14 @@ class EventNotFound(Exception):
 class Observable(object):
     """event system for python"""
 
-    HandlerNotFound = HandlerNotFound # backward compatibiliy
-    EventNotFound = EventNotFound # backward compatibiliy
+    HandlerNotFound = HandlerNotFound  # backward compatibiliy
+    EventNotFound = EventNotFound  # backward compatibiliy
 
     def on(self, event, *handlers):
         """register a handler to a specified event"""
 
         def _on_wrapper(*handlers):
-            self.events[event]+=handlers
+            self.events[event].extend(handlers)
             return handlers[0]
 
         if handlers:
@@ -59,7 +59,7 @@ class Observable(object):
 
         def _once_wrapper(*handlers):
             def _wrapper(*args, **kw):
-                map(lambda x: x(*args, **kw), handlers)
+                list(map(lambda x: x(*args, **kw), handlers))
                 self.off(event, _wrapper)
             return _wrapper
 
@@ -72,7 +72,7 @@ class Observable(object):
 
         if not event in self.events or not self.events[event]:
             return False
-        map(lambda x: x(*args, **kw), self.events[event])
+        list(map(lambda x: x(*args, **kw), self.events[event]))
         return True
 
     @property
@@ -82,5 +82,3 @@ class Observable(object):
         except AttributeError:
             self._events = defaultdict(list)
         return self._events
-
-

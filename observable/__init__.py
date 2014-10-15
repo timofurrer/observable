@@ -1,1 +1,3 @@
-from observable import Observable
+# -*- coding: utf-8 -*-
+
+from .observable import Observable

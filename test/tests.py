@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import threading
 import nose.tools as nose
 from observable import Observable
 
@@ -62,13 +63,16 @@ def test_on_trigger():
     obs = Observable()
     nose.assert_false(obs.events)
 
+    obj = threading.local()
+    obj.called = False
+
     @obs.on("on_test")
-    def on_test():
-        pass
+    def on_test(obj):
+        obj.called = True
 
     nose.assert_equals(obs.events, {"on_test": [on_test]})
-    nose.assert_true(obs.trigger("on_test"))
-    nose.assert_true(obs.trigger("on_test"))
+    nose.assert_true(obs.trigger("on_test", obj))
+    nose.assert_true(obj.called)
 
 
 def test_once_trigger():
@@ -76,15 +80,19 @@ def test_once_trigger():
     obs = Observable()
     nose.assert_false(obs.events)
 
+    obj = threading.local()
+    obj.called = False
+
     @obs.once("once_test")
-    def once_test():
-        pass
+    def once_test(obj):
+        obj.called = True
 
     nose.assert_equals(len(obs.events['once_test']), 1)
     nose.assert_equals(obs.events['once_test'], [once_test])
-    nose.assert_true(obs.trigger("once_test"))
+    nose.assert_true(obs.trigger("once_test", obj))
+    nose.assert_true(obj.called)
     nose.assert_equals(obs.events['once_test'], [])
-    nose.assert_false(obs.trigger("once_test"))
+    nose.assert_false(obs.trigger("once_test", obj))
 
 
 def test_no_event_for_trigger():
@@ -253,4 +261,3 @@ def test_multiple_inheritance():
     obj.on('some', some_test)
 
     obj.test()
-
