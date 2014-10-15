@@ -15,6 +15,7 @@
 
 - Python2.7
 - Python3.2
+- Python3.3
 - Python3.4
 
 ## How to use
