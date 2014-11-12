@@ -1,4 +1,5 @@
 # pyobservable
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/timofurrer/pyobservable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 > observable module for python
 > *Version: 0.02.00*
 
