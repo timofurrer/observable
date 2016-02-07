@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>observable by timofurrer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">observable</h1>
+      <h2 class="project-tagline">event system for python</h2>
+      <a href="https://github.com/timofurrer/pyobservable" class="btn">View on GitHub</a>
+      <a href="https://github.com/timofurrer/pyobservable/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/timofurrer/pyobservable/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="pyobservable" class="anchor" href="#pyobservable" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>pyobservable</h1>
+
+<p><a href="https://gitter.im/timofurrer/pyobservable?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a></p>
+
+<blockquote>
+<p>observable module for python
+<em>Version: 0.3.1</em></p>
+</blockquote>
+
+<p><a href="https://travis-ci.org/timofurrer/pyobservable"><img src="https://travis-ci.org/timofurrer/pyobservable.svg" alt="Build Status"></a></p>
+
+<hr>
+
+<p><strong>Author:</strong> Timo Furrer <a href="mailto:tuxtimo@gmail.com">tuxtimo@gmail.com</a><br>
+<strong>Version:</strong> 0.3.1<br></p>
+
+<p><code>pyobservable</code> is a module purely written in python. It is an event system - This means you can register events and trigger them somewhere else.</p>
+
+<h2>
+<a id="supported-python-versions" class="anchor" href="#supported-python-versions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported Python versions</h2>
+
+<ul>
+<li>Python2.7</li>
+<li>Python3.4</li>
+<li>Python3.5</li>
+</ul>
+
+<h2>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use</h2>
+
+<p>Import it with the following statement in your own program</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> observable <span class="pl-k">import</span> Observable
+
+obs <span class="pl-k">=</span> Observable()</pre></div>
+
+<h3>
+<a id="on-register-event-handler-with-on" class="anchor" href="#on-register-event-handler-with-on" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>on</code>: Register event handler with <code>on</code>
+</h3>
+
+<p>There are two ways to register a function to an event.<br>
+The first way is to register the event with a decorator like this:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-en">@obs.on</span>(<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>)
+<span class="pl-k">def</span> <span class="pl-en">error_func</span>(<span class="pl-smi">message</span>):
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Error: <span class="pl-c1">%s</span><span class="pl-pds">"</span></span> <span class="pl-k">%</span> message)</pre></div>
+
+<p>The second way is to register it with a method call:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">def</span> <span class="pl-en">error_func</span>(<span class="pl-smi">message</span>):
+    <span class="pl-c1">print</span>(<span class="pl-s"><span class="pl-pds">"</span>Error: <span class="pl-c1">%s</span><span class="pl-pds">"</span></span> <span class="pl-k">%</span> message)
+obs.on(<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>, error_func)</pre></div>
+
+<h3>
+<a id="once-register-event-handler-with-once" class="anchor" href="#once-register-event-handler-with-once" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>once</code>: Register event handler with <code>once</code>
+</h3>
+
+<p><code>once</code> works like <code>on</code>, but once the event handler is triggered it will be removed and cannot be triggered again.</p>
+
+<h3>
+<a id="trigger-trigger-event" class="anchor" href="#trigger-trigger-event" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>trigger</code>: trigger event</h3>
+
+<p>You can trigger a registered event with the <code>trigger</code> method:</p>
+
+<div class="highlight highlight-source-python"><pre>obs.trigger(<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>This is my error message<span class="pl-pds">"</span></span>)</pre></div>
+
+<p>If no handler for the event <code>error</code> could be found an <code>Observable.NoHandlerFound</code>-Exception will be raised.</p>
+
+<h3>
+<a id="off-remove-handler-and-events" class="anchor" href="#off-remove-handler-and-events" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><code>off</code>: remove handler and events</h3>
+
+<p>Remove a handler from a specified event:</p>
+
+<div class="highlight highlight-source-python"><pre>obs.off(<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>, error_func)</pre></div>
+
+<div class="highlight highlight-source-python"><pre>obs.off(<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>, [error_func, second_error_func])</pre></div>
+
+<p>Remove all handlers from a specified event:</p>
+
+<div class="highlight highlight-source-python"><pre>obs.off(<span class="pl-s"><span class="pl-pds">"</span>error<span class="pl-pds">"</span></span>)</pre></div>
+
+<p>Clear all events:</p>
+
+<div class="highlight highlight-source-python"><pre>obs.off()</pre></div>
+
+<h2>
+<a id="how-to-install" class="anchor" href="#how-to-install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to install</h2>
+
+<h3>
+<a id="install-with-pip" class="anchor" href="#install-with-pip" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install with PIP</h3>
+
+<pre><code>pip install observable
+</code></pre>
+
+<p><em>Note: you may need root privileges to install</em></p>
+
+<h3>
+<a id="install-from-source" class="anchor" href="#install-from-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install from source</h3>
+
+<p>Just clone this repository with:</p>
+
+<pre><code>git clone https://github.com/timofurrer/pyobservable.git
+</code></pre>
+
+<p>and install it with:</p>
+
+<pre><code>python setup.py install
+</code></pre>
+
+<p><em>Note: you may need root privileges to execute setup.py</em></p>
+
+<h3>
+<a id="with-make" class="anchor" href="#with-make" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>with <code>make</code>
+</h3>
+
+<p>When you have cloned the repository you can install it with</p>
+
+<pre><code>sudo make install
+</code></pre>
+
+<p>If you want to install just if all nose tests are passing</p>
+
+<pre><code>sudo make
+</code></pre>
+
+<h2>
+<a id="contribution" class="anchor" href="#contribution" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contribution</h2>
+
+<p>Feel free to contribute!</p>
+
+<h3>
+<a id="nose-tests" class="anchor" href="#nose-tests" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>nose tests</h3>
+
+<p>There are some <code>nose</code> tests in the <code>test/</code> directory. <br>
+If you haven't installed <code>nose</code> yet - do it with</p>
+
+<pre><code>sudo pip install nose
+</code></pre>
+
+<p>After you've <code>nose</code> installed - test <code>pyobservable</code> with:</p>
+
+<pre><code>make tests
+</code></pre>
+
+<p>The output should be something like:</p>
+
+<pre><code>nosetests -v
+test event registering with the on decorator ... ok
+test event registering with the on method ... ok
+test event registering with the once decorator ... ok
+test event registering with the once method ... ok
+test event triggering with event registered with on ... ok
+test event triggering with event registered with once ... ok
+test exception raising for not existing events ... ok
+test obs.off method ... ok
+test exception raising in the off method ... ok
+test event triggering with arguments ... ok
+test event triggering with argument list ... ok
+test event triggering with keyword-arguments ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.003s
+
+OK
+</code></pre>
+
+<p>... where just the last <code>OK</code> is important!</p>
+
+<h2>
+<a id="inspiration" class="anchor" href="#inspiration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Inspiration</h2>
+
+<p>Writing this module was an inspiration by <a href="https://github.com/js-coder/observable">https://github.com/js-coder/observable</a>.<br><br></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/timofurrer/pyobservable">observable</a> is maintained by <a href="https://github.com/timofurrer">timofurrer</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
