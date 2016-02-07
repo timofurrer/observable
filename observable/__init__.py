@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .observable import Observable
+from .observable import Observable, EventNotFound, HandlerNotFound

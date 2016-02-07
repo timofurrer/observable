@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+"""
+    Event system for python
+"""
+
 from collections import defaultdict
 
 
@@ -18,14 +24,14 @@ class EventNotFound(Exception):
 
 class Observable(object):
     """event system for python"""
+    def __init__(self):
+        self.events = defaultdict(list)
 
-    HandlerNotFound = HandlerNotFound  # backward compatibiliy
-    EventNotFound = EventNotFound  # backward compatibiliy
-
-    def on(self, event, *handlers):
+    def on(self, event, *handlers):  # pylint: disable=invalid-name
         """register a handler to a specified event"""
 
         def _on_wrapper(*handlers):
+            """wrapper for on decorator"""
             self.events[event].extend(handlers)
             return handlers[0]
 
@@ -58,7 +64,9 @@ class Observable(object):
         """register a handler to a specified event, but remove it when it is triggered"""
 
         def _once_wrapper(*handlers):
+            """wrapper for once decorator"""
             def _wrapper(*args, **kw):
+                """call wrapper"""
                 list(map(lambda x: x(*args, **kw), handlers))
                 self.off(event, _wrapper)
             return _wrapper
@@ -74,11 +82,3 @@ class Observable(object):
             return False
         list(map(lambda x: x(*args, **kw), self.events[event]))
         return True
-
-    @property
-    def events(self):
-        try:
-            return self._events
-        except AttributeError:
-            self._events = defaultdict(list)
-        return self._events

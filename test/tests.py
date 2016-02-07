@@ -2,7 +2,8 @@
 
 import threading
 import nose.tools as nose
-from observable import Observable
+
+from observable import Observable, EventNotFound, HandlerNotFound
 
 
 def test_on_decorator():
@@ -101,7 +102,7 @@ def test_no_event_for_trigger():
     nose.assert_false(obs.events)
 
     nose.assert_false(obs.trigger("no_existing_event"))
-    nose.assert_raises(Observable.EventNotFound, obs.off, "no_existing_event")
+    nose.assert_raises(EventNotFound, obs.off, "no_existing_event")
 
 
 def test_off():
@@ -145,7 +146,7 @@ def test_off_exceptions():
     obs = Observable()
     nose.assert_false(obs.events)
 
-    nose.assert_raises(Observable.EventNotFound, obs.off, "non_existing_event")
+    nose.assert_raises(EventNotFound, obs.off, "non_existing_event")
 
     @obs.on("some_event")
     def some_assigned_handler():
@@ -156,7 +157,7 @@ def test_off_exceptions():
 
     nose.assert_in(some_assigned_handler, obs.events["some_event"])
     nose.assert_not_in(some_non_assigned_handler, obs.events["some_event"])
-    nose.assert_raises(Observable.HandlerNotFound, obs.off, "some_event", some_non_assigned_handler)
+    nose.assert_raises(HandlerNotFound, obs.off, "some_event", some_non_assigned_handler)
 
 
 def test_trigger_arg():
@@ -249,7 +250,7 @@ def test_multiple_inheritance():
 
     class SomeBaseAndObservable(SomeBaseClass, Observable):
         def __init__(self):
-            pass
+            super(SomeBaseAndObservable, self).__init__()
 
         def test(self):
             self.trigger('some', True)
