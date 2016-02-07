@@ -1,23 +1,22 @@
 # pyobservable
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/timofurrer/pyobservable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 > observable module for python
-> *Version: 0.3.0*
+> *Version: 0.3.1*
 
 [![Build Status](https://travis-ci.org/timofurrer/pyobservable.svg)](https://travis-ci.org/timofurrer/pyobservable)
 
 ***
 
 **Author:** Timo Furrer <tuxtimo@gmail.com><br />
-**Version:** 0.02.00<br />
+**Version:** 0.3.1<br />
 
 `pyobservable` is a module purely written in python. It is an event system - This means you can register events and trigger them somewhere else.
 
 ## Supported Python versions
 
 - Python2.7
-- Python3.2
-- Python3.3
 - Python3.4
+- Python3.5
 
 ## How to use
 Import it with the following statement in your own program
