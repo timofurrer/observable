@@ -1,3 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .observable import Observable, EventNotFound, HandlerNotFound
+from .core import Observable, EventNotFound, HandlerNotFound
+
+__all__ = [
+    "Observable",
+    "EventNotFound",
+    "HandlerNotFound"
+]
