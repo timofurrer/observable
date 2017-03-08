@@ -8,27 +8,35 @@ from collections import defaultdict
 
 
 class HandlerNotFound(Exception):
-    """Raised if an handler was not found"""
+    """Raised if a handler wasn't found"""
 
     def __init__(self, event, handler):
-        super(HandlerNotFound, self).__init__(
-            "Handler '%s' was not found for event '%s'" % (event, handler))
+        self.event = event
+        self.handler = handler
+
+    def __str__(self):
+        return "Handler {} wasn't found for event {}".format(self.handler,
+                                                             self.event)
 
 
 class EventNotFound(Exception):
-    """Raised if an event was not found"""
+    """Raised if an event wasn't found"""
 
     def __init__(self, event):
-        super(EventNotFound, self).__init__("Event '%s' was not found" % event)
+        self.event = event
+
+    def __str__(self):
+        return "Event {} wasn't found".format(self.event)
 
 
 class Observable(object):
-    """event system for python"""
+    """Event system for python"""
+
     def __init__(self):
         self.events = defaultdict(list)
 
     def on(self, event, *handlers):  # pylint: disable=invalid-name
-        """register a handler to a specified event"""
+        """Register a handler to a specified event"""
 
         def _on_wrapper(*handlers):
             """wrapper for on decorator"""
@@ -40,7 +48,7 @@ class Observable(object):
         return _on_wrapper
 
     def off(self, event=None, *handlers):
-        """unregister an event or handler from an event"""
+        """Unregister an event or handler from an event"""
 
         if not event:
             self.events.clear()
@@ -50,7 +58,7 @@ class Observable(object):
             raise EventNotFound(event)
 
         if not handlers:
-            self.events.pop(event, None)
+            self.events.pop(event)
             return True
 
         for callback in handlers:
@@ -61,14 +69,18 @@ class Observable(object):
         return True
 
     def once(self, event, *handlers):
-        """register a handler to a specified event, but remove it when it is triggered"""
+        """Register a handler to a specified event, but remove it when it is triggered"""
 
         def _once_wrapper(*handlers):
-            """wrapper for once decorator"""
+            """Wrapper for 'once' decorator"""
+
             def _wrapper(*args, **kw):
-                """call wrapper"""
-                list(map(lambda x: x(*args, **kw), handlers))
+                """Call wrapper"""
+                for handler in handlers:
+                    handler(*args, **kw)
+
                 self.off(event, _wrapper)
+
             return _wrapper
 
         if handlers:
@@ -76,9 +88,13 @@ class Observable(object):
         return lambda x: self.on(event, _once_wrapper(x))
 
     def trigger(self, event, *args, **kw):
-        """trigger all functions from an event"""
+        """Trigger all functions which are subscribed to an event"""
 
-        if not event in self.events or not self.events[event]:
+        functions = self.events.get(event)
+        if not functions:
             return False
-        list(map(lambda x: x(*args, **kw), self.events[event]))
+
+        for event in functions:
+            event(*args, **kw)
+
         return True
