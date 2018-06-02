@@ -3,6 +3,8 @@
 
 **pyobservable** is a minimalist event system for python. It provides you an easy-to-use interface to trigger arbitrary functions when specific events occur.
 
+**Note:** We are Python 3 only! Only Python Versions >= 3.5 are supported. Use [v0.3.2](https://pypi.org/project/observable/0.3.2/) for older Python Versions.
+
 ## How to use
 Import it with the following statement in your own program
 
