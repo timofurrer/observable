@@ -86,6 +86,8 @@ Then you can do the following to inspect the registered handlers:
 [<function success_func at 0x7f7f32d0a1e0>]
 >>> obs.get_handlers("other_event")
 []
+```
+
 ## How to install
 
 ### Install with PIP
