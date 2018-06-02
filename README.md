@@ -65,6 +65,29 @@ Clear all events:
 obs.off()
 ```
 
+### `get_all_handlers`, `get_handlers` and `is_registered`: Check which handlers are registered
+Imagine you registered the following handlers:
+
+```python
+@obs.on("success")
+def success_func():
+    print("Success!")
+
+@obs.on("error")
+def error_func(message):
+    print("Error: %s" % message)
+```
+
+Then you can do the following to inspect the registered handlers:
+```python
+>>> obs.get_all_handlers()
+{'success': [<function success_func at 0x7f7f32d0a1e0>], 'error': [<function error_func at 0x7f7f32d0a268>]}
+>>> obs.get_handlers("success")
+[<function success_func at 0x7f7f32d0a1e0>]
+>>> obs.get_handlers("other_event")
+[]
+```
+
 ## How to install
 
 ### Install with PIP

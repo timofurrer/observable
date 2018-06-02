@@ -9,60 +9,60 @@ from observable import Observable, EventNotFound, HandlerNotFound
 def test_on_decorator():
     """test event registering with the on decorator"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.on("on_test")
     def on_test():
         pass
 
-    nose.assert_in(on_test, obs.events["on_test"])
+    nose.assert_in(on_test, obs._events["on_test"])
 
 
 def test_on():
     """test event registering with the on method"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     def on_test():
         pass
 
     obs.on("on_test", on_test)
-    nose.assert_in(on_test, obs.events["on_test"])
+    nose.assert_in(on_test, obs._events["on_test"])
 
 
 def test_once_decorator():
     """test event registering with the once decorator"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.once("once_test")
     def once_test():
         pass
 
-    nose.assert_in(once_test, obs.events["once_test"])
+    nose.assert_in(once_test, obs._events["once_test"])
     nose.assert_true(obs.trigger("once_test"))
-    nose.assert_not_in(once_test, obs.events["once_test"])
+    nose.assert_not_in(once_test, obs._events["once_test"])
 
 
 def test_once():
     """test event registering with the once method"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     def once_test():
         pass
 
     obs.once("once_test", once_test)
 
-    nose.assert_equals(len(obs.events["once_test"]), 1)
+    nose.assert_equals(len(obs._events["once_test"]), 1)
     nose.assert_true(obs.trigger("once_test"))
-    nose.assert_equals(obs.events["once_test"], [])
+    nose.assert_equals(obs._events["once_test"], [])
 
 
 def test_on_trigger():
     """test event triggering with event registered with on"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     obj = threading.local()
     obj.called = False
@@ -71,7 +71,7 @@ def test_on_trigger():
     def on_test(obj):
         obj.called = True
 
-    nose.assert_equals(obs.events, {"on_test": [on_test]})
+    nose.assert_equals(obs._events, {"on_test": [on_test]})
     nose.assert_true(obs.trigger("on_test", obj))
     nose.assert_true(obj.called)
 
@@ -79,7 +79,7 @@ def test_on_trigger():
 def test_once_trigger():
     """test event triggering with event registered with once"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     obj = threading.local()
     obj.called = False
@@ -88,18 +88,18 @@ def test_once_trigger():
     def once_test(obj):
         obj.called = True
 
-    nose.assert_equals(len(obs.events['once_test']), 1)
-    nose.assert_equals(obs.events['once_test'], [once_test])
+    nose.assert_equals(len(obs._events['once_test']), 1)
+    nose.assert_equals(obs._events['once_test'], [once_test])
     nose.assert_true(obs.trigger("once_test", obj))
     nose.assert_true(obj.called)
-    nose.assert_equals(obs.events['once_test'], [])
+    nose.assert_equals(obs._events['once_test'], [])
     nose.assert_false(obs.trigger("once_test", obj))
 
 
 def test_no_event_for_trigger():
     """test exception raising for not existing events"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     nose.assert_false(obs.trigger("no_existing_event"))
     nose.assert_raises(EventNotFound, obs.off, "no_existing_event")
@@ -108,19 +108,19 @@ def test_no_event_for_trigger():
 def test_off():
     """test obs.off method"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.on("on_test")
     def on_test():
         pass
 
-    nose.assert_equals(obs.events['on_test'], [on_test])
+    nose.assert_equals(obs._events['on_test'], [on_test])
     nose.assert_true(obs.trigger("on_test"))
     obs.off("on_test", on_test)
-    nose.assert_equals(obs.events['on_test'],[])
+    nose.assert_equals(obs._events['on_test'],[])
 
     obs.off()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.on("more_than_one_event")
     def func1():
@@ -134,17 +134,17 @@ def test_off():
     def func3():
         pass
 
-    nose.assert_equals(obs.events["more_than_one_event"], [func1, func2, func3])
+    nose.assert_equals(obs._events["more_than_one_event"], [func1, func2, func3])
     obs.off("more_than_one_event", func2)
-    nose.assert_equals(obs.events["more_than_one_event"], [func1, func3])
+    nose.assert_equals(obs._events["more_than_one_event"], [func1, func3])
     obs.off("more_than_one_event")
-    nose.assert_equals(obs.events["more_than_one_event"], [])
+    nose.assert_equals(obs._events["more_than_one_event"], [])
 
 
 def test_off_exceptions():
     """test exception raising in the off method"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     nose.assert_raises(EventNotFound, obs.off, "non_existing_event")
 
@@ -155,15 +155,15 @@ def test_off_exceptions():
     def some_non_assigned_handler():
         pass
 
-    nose.assert_in(some_assigned_handler, obs.events["some_event"])
-    nose.assert_not_in(some_non_assigned_handler, obs.events["some_event"])
+    nose.assert_in(some_assigned_handler, obs._events["some_event"])
+    nose.assert_not_in(some_non_assigned_handler, obs._events["some_event"])
     nose.assert_raises(HandlerNotFound, obs.off, "some_event", some_non_assigned_handler)
 
 
 def test_trigger_arg():
     """test event triggering with arguments"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.on("some_test")
     def some_test(some_data):
@@ -175,7 +175,7 @@ def test_trigger_arg():
 def test_trigger_args():
     """test event triggering with argument list"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.on("some_test")
     def some_test(some_data, some_other_data):
@@ -188,7 +188,7 @@ def test_trigger_args():
 def test_trigger_kwargs():
     """test event triggering with keyword-arguments"""
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     @obs.on("some_test")
     def some_test(some_data=True, some_other_data=False):
@@ -202,7 +202,7 @@ def test_on_multiple_handlers():
     """test event registering with the on method and multiple handlers"""
 
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     results = []
 
@@ -213,7 +213,7 @@ def test_on_multiple_handlers():
         results.append(2)
 
     obs.on('some_test', some_test, some_test_2)
-    nose.assert_equals(len(obs.events['some_test']), 2)
+    nose.assert_equals(len(obs._events['some_test']), 2)
 
     obs.trigger('some_test')
     nose.assert_equals(results, [1,2])
@@ -223,7 +223,7 @@ def test_off_multiple_handlers():
     """test event unregistering with the off method and multiple handlers"""
 
     obs = Observable()
-    nose.assert_false(obs.events)
+    nose.assert_false(obs._events)
 
     results = []
 
@@ -234,10 +234,10 @@ def test_off_multiple_handlers():
         results.append(2)
 
     obs.on('some_test', some_test, some_test_2)
-    nose.assert_equals(len(obs.events['some_test']), 2)
+    nose.assert_equals(len(obs._events['some_test']), 2)
 
     obs.off('some_test', some_test, some_test_2)
-    nose.assert_equals(len(obs.events['some_test']), 0)
+    nose.assert_equals(len(obs._events['some_test']), 0)
 
     nose.assert_false(obs.trigger('some_test'))
 
@@ -262,3 +262,53 @@ def test_multiple_inheritance():
     obj.on('some', some_test)
 
     obj.test()
+
+def test_get_all_handlers():
+    """test get_all_handlers() after registering handlers for two events"""
+    obs = Observable()
+    nose.assert_false(obs._events)
+
+    def some_test():
+        pass
+
+    def other_test():
+        pass
+
+    nose.assert_false(obs.get_all_handlers())
+    obs.on("some_event", some_test)
+    nose.assert_in("some_event", obs.get_all_handlers())
+    nose.assert_in(some_test, obs.get_all_handlers()["some_event"])
+    obs.on("other_event", other_test)
+    nose.assert_in("other_event", obs.get_all_handlers())
+    nose.assert_in(other_test, obs.get_all_handlers()["other_event"])
+    nose.assert_not_in(other_test, obs.get_all_handlers()["some_event"])
+
+def test_get_handlers():
+    """test get_handlers() after registering handlers for two events"""
+    obs = Observable()
+    nose.assert_false(obs._events)
+
+    def some_test():
+        pass
+
+    def other_test():
+        pass
+
+    nose.assert_false(obs.get_handlers("some_event"))
+    obs.on("some_event", some_test)
+    nose.assert_in(some_test, obs.get_handlers("some_event"))
+    obs.on("other_event", other_test)
+    nose.assert_in(other_test, obs.get_handlers("other_event"))
+    nose.assert_not_in(other_test, obs.get_handlers("some_event"))
+
+def test_is_registered():
+    """test is_registered() after registering an event"""
+    obs = Observable()
+    nose.assert_false(obs._events)
+
+    def some_test():
+        pass
+
+    nose.assert_false(obs.is_registered("some_event", some_test))
+    obs.on("some_event", some_test)
+    nose.assert_true(obs.is_registered("some_event", some_test))
