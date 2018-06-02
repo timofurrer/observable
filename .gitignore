@@ -14,3 +14,6 @@ env*
 # testing
 .tox/
 .coverage
+
+# mypy
+.mypy_cache
