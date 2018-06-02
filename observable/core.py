@@ -33,40 +33,39 @@ class Observable(object):
     """Event system for python"""
 
     def __init__(self):
-        self.events = defaultdict(list)
+        self._events = defaultdict(list)
+
+    def get_all_handlers(self):
+        """Returns a dict with event names as keys and lists of
+        registered handlers as values."""
+
+        events = {}
+        for event, handlers in self._events.items():
+            events[event] = list(handlers)
+        return events
+
+    def get_handlers(self, event):
+        """Returns a list of handlers registered for the given event."""
+
+        return list(self._events.get(event, []))
+
+    def is_registered(self, event, handler):
+        """Returns whether the given handler is registered for the
+        given event."""
+
+        return handler in self._events.get(event, [])
 
     def on(self, event, *handlers):  # pylint: disable=invalid-name
         """Register a handler to a specified event"""
 
         def _on_wrapper(*handlers):
             """wrapper for on decorator"""
-            self.events[event].extend(handlers)
+            self._events[event].extend(handlers)
             return handlers[0]
 
         if handlers:
             return _on_wrapper(*handlers)
         return _on_wrapper
-
-    def off(self, event=None, *handlers):
-        """Unregister an event or handler from an event"""
-
-        if not event:
-            self.events.clear()
-            return True
-
-        if not event in self.events:
-            raise EventNotFound(event)
-
-        if not handlers:
-            self.events.pop(event)
-            return True
-
-        for callback in handlers:
-            if not callback in self.events[event]:
-                raise HandlerNotFound(event, callback)
-            while callback in self.events[event]:
-                self.events[event].remove(callback)
-        return True
 
     def once(self, event, *handlers):
         """Register a handler to a specified event, but remove it when it is triggered"""
@@ -87,10 +86,32 @@ class Observable(object):
             return self.on(event, _once_wrapper(*handlers))
         return lambda x: self.on(event, _once_wrapper(x))
 
+    def off(self, event=None, *handlers):
+        """Unregister an event or handler from an event"""
+
+        if not event:
+            self._events.clear()
+            return True
+
+        if not event in self._events:
+            raise EventNotFound(event)
+
+        if not handlers:
+            self._events.pop(event)
+            return True
+
+        for callback in handlers:
+            if not callback in self._events[event]:
+                raise HandlerNotFound(event, callback)
+            while callback in self._events[event]:
+                self._events[event].remove(callback)
+        return True
+
+
     def trigger(self, event, *args, **kw):
         """Trigger all functions which are subscribed to an event"""
 
-        functions = self.events.get(event)
+        functions = self._events.get(event)
         if not functions:
             return False
 
