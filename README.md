@@ -1,5 +1,5 @@
 # observable
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/timofurrer/pyobservable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/timofurrer/pyobservable.svg)](https://travis-ci.org/timofurrer/pyobservable)
+[![Build Status](https://travis-ci.com/timofurrer/observable.svg?branch=master)](https://travis-ci.com/timofurrer/observable)
 
 **pyobservable** is a minimalist event system for python. It provides you an easy-to-use interface to trigger arbitrary functions when specific events occur.
 
