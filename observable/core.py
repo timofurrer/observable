@@ -41,7 +41,7 @@ class Observable(object):
 
     def get_all_handlers(self) -> T.Dict[str, T.List[T.Callable]]:
         """Returns a dict with event names as keys and lists of
-        registered handlers as values."""
+        registered handlers as values"""
 
         events = {}
         for event, handlers in self._events.items():
@@ -49,18 +49,18 @@ class Observable(object):
         return events
 
     def get_handlers(self, event: str) -> T.List[T.Callable]:
-        """Returns a list of handlers registered for the given event."""
+        """Returns a list of handlers registered for the given event"""
 
         return list(self._events.get(event, []))
 
     def is_registered(self, event: str, handler: T.Callable) -> bool:
         """Returns whether the given handler is registered for the
-        given event."""
+        given event"""
 
         return handler in self._events.get(event, [])
 
     def on(self, event: str, *handlers: T.Callable) -> T.Callable:  # pylint: disable=invalid-name
-        """Register a handler to a specified event"""
+        """Register one or more handlers to a specified event"""
 
         def _on_wrapper(*handlers: T.Callable) -> T.Callable:
             """wrapper for on decorator"""
@@ -72,7 +72,7 @@ class Observable(object):
         return _on_wrapper
 
     def off(self, event: str = None, *handlers: T.Callable) -> bool:
-        """Unregister an event or handler from an event"""
+        """Unregister a whole event or one or more handlers from an event"""
 
         if not event:
             self._events.clear()
@@ -93,17 +93,19 @@ class Observable(object):
         return True
 
     def once(self, event: str, *handlers: T.Callable) -> T.Callable:
-        """Register a handler to a specified event, but remove it when it is triggered"""
+        """Register one or more handlers to a specified event, but
+        remove them when the event is first triggered"""
 
         def _once_wrapper(*handlers: T.Callable) -> T.Callable:
             """Wrapper for 'once' decorator"""
 
             def _wrapper(*args: T.Any, **kw: T.Any) -> None:
-                """Call wrapper"""
-                for handler in handlers:
-                    handler(*args, **kw)
+                """Wrapper that unregisters itself before executing
+                the handlers"""
 
                 self.off(event, _wrapper)
+                for handler in handlers:
+                    handler(*args, **kw)
 
             return _wrapper
 
@@ -112,13 +114,13 @@ class Observable(object):
         return lambda x: self.on(event, _once_wrapper(x))
 
     def trigger(self, event: str, *args: T.Any, **kw: T.Any) -> bool:
-        """Trigger all functions which are subscribed to an event"""
+        """Trigger all handlers which are subscribed to an event"""
 
         callbacks = self._events.get(event)
         if not callbacks:
             return False
 
-        for callback in callbacks:
+        for callback in list(callbacks):
             callback(*args, **kw)
 
         return True
