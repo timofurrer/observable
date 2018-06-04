@@ -41,7 +41,7 @@ class Observable(object):
 
     def get_all_handlers(self) -> T.Dict[str, T.List[T.Callable]]:
         """Returns a dict with event names as keys and lists of
-        registered handlers as values"""
+        registered handlers as values."""
 
         events = {}
         for event, handlers in self._events.items():
@@ -49,18 +49,19 @@ class Observable(object):
         return events
 
     def get_handlers(self, event: str) -> T.List[T.Callable]:
-        """Returns a list of handlers registered for the given event"""
+        """Returns a list of handlers registered for the given event."""
 
         return list(self._events.get(event, []))
 
     def is_registered(self, event: str, handler: T.Callable) -> bool:
         """Returns whether the given handler is registered for the
-        given event"""
+        given event."""
 
         return handler in self._events.get(event, [])
 
     def on(self, event: str, *handlers: T.Callable) -> T.Callable:  # pylint: disable=invalid-name
-        """Register one or more handlers to a specified event"""
+        """Registers one or more handlers to a specified event.
+        This method may as well be used as a decorator for the handler."""
 
         def _on_wrapper(*handlers: T.Callable) -> T.Callable:
             """wrapper for on decorator"""
@@ -71,30 +72,34 @@ class Observable(object):
             return _on_wrapper(*handlers)
         return _on_wrapper
 
-    def off(self, event: str = None, *handlers: T.Callable) -> bool:
-        """Unregister a whole event or one or more handlers from an event"""
+    def off(self, event: str = None, *handlers: T.Callable) -> None:  # pylint: disable=keyword-arg-before-vararg
+        """Unregisters a whole event (if no handlers are given) or one
+        or more handlers from an event.
+        Raises EventNotFound when the given event isn't registered.
+        Raises HandlerNotFound when a given handler isn't registered."""
 
         if not event:
             self._events.clear()
-            return True
+            return
 
         if event not in self._events:
             raise EventNotFound(event)
 
         if not handlers:
             self._events.pop(event)
-            return True
+            return
 
         for callback in handlers:
             if not callback in self._events[event]:
                 raise HandlerNotFound(event, callback)
             while callback in self._events[event]:
                 self._events[event].remove(callback)
-        return True
+        return
 
     def once(self, event: str, *handlers: T.Callable) -> T.Callable:
-        """Register one or more handlers to a specified event, but
-        remove them when the event is first triggered"""
+        """Registers one or more handlers to a specified event, but
+        removes them when the event is first triggered.
+        This method may as well be used as a decorator for the handler."""
 
         def _once_wrapper(*handlers: T.Callable) -> T.Callable:
             """Wrapper for 'once' decorator"""
@@ -114,13 +119,13 @@ class Observable(object):
         return lambda x: self.on(event, _once_wrapper(x))
 
     def trigger(self, event: str, *args: T.Any, **kw: T.Any) -> bool:
-        """Trigger all handlers which are subscribed to an event"""
+        """Triggers all handlers which are subscribed to an event.
+        Returns True when there were callbacks to execute, False otherwise."""
 
-        callbacks = self._events.get(event)
+        callbacks = list(self._events.get(event, []))
         if not callbacks:
             return False
 
-        for callback in list(callbacks):
+        for callback in callbacks:
             callback(*args, **kw)
-
         return True
