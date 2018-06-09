@@ -6,8 +6,4 @@
 
 from .core import Observable, EventNotFound, HandlerNotFound
 
-__all__ = [
-    "Observable",
-    "EventNotFound",
-    "HandlerNotFound"
-]
+__all__ = ["Observable", "EventNotFound", "HandlerNotFound"]

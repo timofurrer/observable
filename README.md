@@ -1,5 +1,6 @@
 # observable
 [![Build Status](https://travis-ci.com/timofurrer/observable.svg?branch=master)](https://travis-ci.com/timofurrer/observable)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 **pyobservable** is a minimalist event system for python. It provides you an easy-to-use interface to trigger arbitrary functions when specific events occur.
 

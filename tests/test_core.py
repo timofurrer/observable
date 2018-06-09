@@ -83,11 +83,11 @@ def test_once_trigger():
     def once_test(obj):
         obj.called = True
 
-    assert len(obs._events['once_test']) == 1
-    assert obs._events['once_test'] == [once_test]
+    assert len(obs._events["once_test"]) == 1
+    assert obs._events["once_test"] == [once_test]
     assert obs.trigger("once_test", obj)
     assert obj.called
-    assert obs._events['once_test'] == []
+    assert obs._events["once_test"] == []
     assert not obs.trigger("once_test", obj)
 
 
@@ -109,12 +109,12 @@ def test_off():
     def on_test():
         pass
 
-    assert obs._events['on_test'] == [on_test]
+    assert obs._events["on_test"] == [on_test]
     assert obs.trigger("on_test")
 
     obs.off("on_test", on_test)
 
-    assert obs._events['on_test'] == []
+    assert obs._events["on_test"] == []
 
     obs.off()
 
@@ -207,10 +207,10 @@ def test_on_multiple_handlers():
     def some_test_2(*args, **kw):
         results.append(2)
 
-    obs.on('some_test', some_test, some_test_2)
-    assert len(obs._events['some_test']) == 2
+    obs.on("some_test", some_test, some_test_2)
+    assert len(obs._events["some_test"]) == 2
 
-    obs.trigger('some_test')
+    obs.trigger("some_test")
     assert results == [1, 2]
 
 
@@ -226,12 +226,12 @@ def test_off_multiple_handlers():
     def some_test_2(*args, **kw):
         results.append(2)
 
-    obs.on('some_test', some_test, some_test_2)
-    assert len(obs._events['some_test']) == 2
+    obs.on("some_test", some_test, some_test_2)
+    assert len(obs._events["some_test"]) == 2
 
-    obs.off('some_test', some_test, some_test_2)
-    assert len(obs._events['some_test']) == 0
-    assert not obs.trigger('some_test')
+    obs.off("some_test", some_test, some_test_2)
+    assert len(obs._events["some_test"]) == 0
+    assert not obs.trigger("some_test")
 
 
 def test_multiple_inheritance():
@@ -245,13 +245,13 @@ def test_multiple_inheritance():
             super(SomeBaseAndObservable, self).__init__()
 
         def test(self):
-            self.trigger('some', True)
+            self.trigger("some", True)
 
     def some_test(data):
         assert data is True
 
     obj = SomeBaseAndObservable()
-    obj.on('some', some_test)
+    obj.on("some", some_test)
 
     obj.test()
 

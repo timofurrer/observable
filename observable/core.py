@@ -18,8 +18,7 @@ class HandlerNotFound(Exception):
         self.handler = handler
 
     def __str__(self) -> str:
-        return "Handler {} wasn't found for event {}" \
-               .format(self.handler, self.event)
+        return "Handler {} wasn't found for event {}".format(self.handler, self.event)
 
 
 class EventNotFound(Exception):
@@ -59,7 +58,9 @@ class Observable(object):
 
         return handler in self._events.get(event, [])
 
-    def on(self, event: str, *handlers: T.Callable) -> T.Callable:  # pylint: disable=invalid-name
+    def on(
+        self, event: str, *handlers: T.Callable
+    ) -> T.Callable:  # pylint: disable=invalid-name
         """Registers one or more handlers to a specified event.
         This method may as well be used as a decorator for the handler."""
 
@@ -72,7 +73,9 @@ class Observable(object):
             return _on_wrapper(*handlers)
         return _on_wrapper
 
-    def off(self, event: str = None, *handlers: T.Callable) -> None:  # pylint: disable=keyword-arg-before-vararg
+    def off(
+        self, event: str = None, *handlers: T.Callable
+    ) -> None:  # pylint: disable=keyword-arg-before-vararg
         """Unregisters a whole event (if no handlers are given) or one
         or more handlers from an event.
         Raises EventNotFound when the given event isn't registered.
