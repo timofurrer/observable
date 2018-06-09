@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+    Event system for python
+"""
+
 from .core import Observable, EventNotFound, HandlerNotFound
 
 __all__ = [
