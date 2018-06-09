@@ -4,16 +4,42 @@
 
 **pyobservable** is a minimalist event system for python. It provides you an easy-to-use interface to trigger arbitrary functions when specific events occur.
 
+```python
+from observable import Observable
+
+obs = Observable()
+
+@obs.on("error")
+def error_handler(message):
+    # do some fancy error handling
+    logging.error(f"An error occured: {message}")
+
+...
+
+def do_time_travel():
+    # do some time traveling
+    ...
+    if year != 1291:
+        obs.trigger("error", "Time travel to 1291 didn't work")
+```
+
 **Note:** We are Python 3 only! Only Python Versions >= 3.5 are supported. Use [v0.3.2](https://pypi.org/project/observable/0.3.2/) for older Python Versions.
 
 ## How to use
-Import it with the following statement in your own program
+
+Use a `pip` to install it from PyPI:
+
+    pip install observable
+
+After completion you can start using `observable`:
 
 ```python
 from observable import Observable
 
 obs = Observable()
 ```
+
+## Usage
 
 ### `on`: Register event handler with `on`
 There are two ways to register a function to an event.<br />
@@ -91,14 +117,6 @@ Then you can do the following to inspect the registered handlers:
 []
 ```
 
-## How to install
+***
 
-### Install with PIP
-
-    pip install observable
-
-*Note: you may need root privileges to install*
-
-## Inspiration
-Writing this module was an inspiration by https://github.com/js-coder/observable.<br /><br/>
-
+*<p align="center">This project is published under [MIT](LICENSE).<br>A [Timo Furrer](https://tuxtimo.me) project.<br>- :tada: -</p>*
