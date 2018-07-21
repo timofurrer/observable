@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import threading
 
 import pytest
@@ -97,7 +95,7 @@ def test_no_event_for_trigger():
 
     assert not obs.trigger("no_existing_event")
 
-    with pytest.raises(EventNotFound) as exc:
+    with pytest.raises(EventNotFound):
         obs.off("no_existing_event")
 
 
@@ -143,7 +141,7 @@ def test_off_exceptions():
     """test exception raising in the off method"""
     obs = Observable()
 
-    with pytest.raises(EventNotFound) as exc:
+    with pytest.raises(EventNotFound):
         obs.off("non_existing_event")
 
     @obs.on("some_event")
@@ -156,7 +154,7 @@ def test_off_exceptions():
     assert some_assigned_handler in obs._events["some_event"]
     assert some_non_assigned_handler not in obs._events["some_event"]
 
-    with pytest.raises(HandlerNotFound) as exc:
+    with pytest.raises(HandlerNotFound):
         obs.off("some_event", some_non_assigned_handler)
 
 

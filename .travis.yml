@@ -5,6 +5,9 @@ python:
     - "3.7-dev"
 
 install:
-  - pip install pytest
+  - pip install pytest mypy flake8
 
-script: pytest tests/
+script:
+    - flake8 observable/ tests/ setup.py
+    - mypy observable/
+    - pytest tests/

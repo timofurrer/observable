@@ -93,7 +93,7 @@ class Observable(object):
             return
 
         for callback in handlers:
-            if not callback in self._events[event]:
+            if callback not in self._events[event]:
                 raise HandlerNotFound(event, callback)
             while callback in self._events[event]:
                 self._events[event].remove(callback)
