@@ -7,6 +7,9 @@ import typing as T
 from .core import Observable
 
 
+__all__ = ["ObservableProperty"]
+
+
 class ObservableProperty(property):
     """
     A property that can be observed easily by listening for some special,
