@@ -6,7 +6,7 @@ import sys
 import codecs
 from shutil import rmtree
 
-from setuptools import setup, Command
+from setuptools import setup, find_packages, Command
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -20,8 +20,6 @@ if sys.argv[-1] == "publish":
     sys.exit()
 
 required = []
-
-packages = ["observable"]
 
 
 class UploadCommand(Command):
@@ -76,7 +74,7 @@ setup(
     author="Timo Furrer",
     author_email="tuxtimo@gmail.com",
     url="https://github.com/timofurrer/observable",
-    packages=packages,
+    packages=find_packages(),
     install_requires=required,
     license="MIT",
     classifiers=(
