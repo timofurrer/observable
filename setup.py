@@ -71,6 +71,7 @@ setup(
     version=about["__version__"],
     description="minimalist event system",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Timo Furrer",
     author_email="tuxtimo@gmail.com",
     url="https://github.com/timofurrer/observable",
