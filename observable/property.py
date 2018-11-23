@@ -4,10 +4,26 @@
 
 import typing as T
 
+import functools
+
 from .core import Observable
 
 
 __all__ = ["ObservableProperty"]
+
+
+def _preserve_settings(func: T.Callable) -> T.Callable:
+    """Decorator that ensures ObservableProperty-specific attributes
+    are kept when using methods to change deleter, getter or setter."""
+
+    @functools.wraps(func)
+    def _wrapper(old: "ObservableProperty", handler: T.Callable) -> "ObservableProperty":
+        new = func(old, handler)
+        new.event = old.event
+        new.observable = old.observable
+        return new
+
+    return _wrapper
 
 
 class ObservableProperty(property):
@@ -16,75 +32,114 @@ class ObservableProperty(property):
     auto-generated events. It's API is identical to that of the build-in
     property class.
 
-    The getter, setter and deleter of ObservableProperty have to be
-    methods of an object inheriting from Observable, so that ``on()``,
-    ``trigger()`` etc. are available on the object holding the property..
+    The ObservableProperty needs an Observable object for triggering
+    events. If the property is a member of an object of type Observable,
+    that one will be used automatically. To specify a different Observable
+    object, pass it as the observable keyword argument when initializing
+    the ObservableProperty. You may also pass a string for observable,
+    it's then looked for an attribute of that name in the containing
+    object. This is useful to specify the name of an attribute which
+    will only be created at object initialization and thus isn't there
+    when defining the property.
 
     The following events are triggered:
-    * "<name>_get"(value): Triggered whenever the property's value
+    * "get_<name>"(value): Triggered whenever the property's value
       is retrieved.
-    * "<name>_set"(value): Triggered after the property's value has
+    * "set_<name>"(value): Triggered after the property's value has
       been set.
-    * "<name>_del"(): Triggered before the property is deleted.
-    * "<name>_deleted"(): Triggered after the property deletion finished.
+    * "del_<name>"(): Triggered before the property is deleted.
+    * "deleted_<name>"(): Triggered after the property deletion finished.
 
     <name> has to be replaced with the property's name. Note that names
     are taken from the individual functions supplied as getter, setter
     and deleter, so please name those functions like the property itself.
+    Alternatively, the name can be overwritten by specifying the name
+    keyword argument when initializing the ObservableProperty.
+
+    The convenience helper ObservableProperty.create_with() can be
+    used as a decorator for creating ObservableProperty objects with
+    event and observable set. It returns a functools.partial() with the
+    chosen attributes.
+
+    Here's an example for using the event and observable keyword arguments:
+
+        >>> import functools
+        >>> from observable import Observable
+        >>> from observable.property import ObservableProperty
+        >>> class MyObject:
+        ...     def __init__(self):
+        ...         self.obs = Observable()
+        ...         self._prop = 42
+        ...     @ObservableProperty.create_with(event="my_prop", observable="obs")
+        ...     def some_obscure_name(self):
+        ...         return self._prop
+        ...
+        >>> obj = MyObject()
+        >>> obj.obs.on("get_my_prop", functools.partial(print, "Got value"))
+        >>> obj.some_obscure_name
+        Got value 42
+        >>>
     """
 
     def __init__(
-            self,
-            fget: T.Callable = None, fset: T.Callable = None,
-            fdel: T.Callable = None, doc: str = None
+            self, *args: T.Any,
+            event: str = None, observable: T.Union[Observable, str] = None,
+            **kwargs: T.Any
     ) -> None:
-        if fdel:
-            fdel = self._build_fdel(fdel)
-        if fget:
-            fget = self._build_fget(fget)
-        if fset:
-            fset = self._build_fset(fset)
-        super().__init__(fget=fget, fset=fset, fdel=fdel, doc=doc)
+        super().__init__(*args, **kwargs)
 
-    @staticmethod
-    def _build_fdel(
-            fdel: T.Callable[[Observable], None],
-    ) -> T.Callable[[Observable], None]:
-        def handler(obj: Observable) -> None:
-            obj.trigger("{}_del".format(fdel.__name__))
-            fdel(obj)
-            obj.trigger("{}_deleted".format(fdel.__name__))
-        return handler
+        self.event = event
+        self.observable = observable
 
-    @staticmethod
-    def _build_fget(
-            fget: T.Callable[[Observable], T.Any],
-    ) -> T.Callable[[Observable], T.Any]:
-        def handler(obj: Observable) -> T.Any:
-            value = fget(obj)
-            obj.trigger("{}_get".format(fget.__name__), value)
+    def __delete__(self, instance: T.Any) -> None:
+        if self.fdel is not None:
+            self._trigger_event(instance, self.fdel.__name__, "del")
+        super().__delete__(instance)
+        self._trigger_event(instance, self.fdel.__name__, "deleted")
+
+    def __get__(self, instance: T.Any, owner: T.Any = None) -> T.Any:
+        value = super().__get__(instance, owner)
+        if instance is None:
             return value
-        return handler
+        self._trigger_event(instance, self.fget.__name__, "get", value)
+        return value
 
-    @staticmethod
-    def _build_fset(
-            fset: T.Callable[[Observable, T.Any], None],
-    ) -> T.Callable[[Observable, T.Any], None]:
-        def handler(obj: Observable, value: T.Any) -> None:
-            fset(obj, value)
-            obj.trigger("{}_set".format(fset.__name__), value)
-        return handler
+    def __set__(self, instance: T.Any, value: T.Any) -> None:
+        super().__set__(instance, value)
+        self._trigger_event(instance, self.fset.__name__, "set", value)
 
-    def deleter(self, fdel: T.Callable[[Observable], None]) -> property:
-        """Decorator to change the deleter of the property."""
-        return super().deleter(self._build_fdel(fdel))
+    def _trigger_event(
+            self, holder: T.Any, alt_name: str, action: str, *event_args: T.Any
+    ) -> None:
+        """Triggers an event on the associated Observable object."""
 
-    def getter(self, fget: T.Callable[[Observable], T.Any]) -> property:
-        """Decorator to change the getter of the property."""
-        return super().getter(self._build_fget(fget))
+        if isinstance(self.observable, Observable):
+            observable = self.observable
+        elif isinstance(self.observable, str):
+            observable = getattr(holder, self.observable)
+        elif isinstance(holder, Observable):
+            observable = holder
+        else:
+            raise TypeError(
+                "This ObservableProperty is no member of an Observable "
+                "object. Specify where to find the Observable object for "
+                "triggering events with the observable keyword argument "
+                "when initializing the ObservableProperty."
+            )
 
-    def setter(
-            self, fset: T.Callable[[Observable, T.Any], None],
-    ) -> property:
-        """Decorator to change the setter of the property."""
-        return super().setter(self._build_fset(fset))
+        name = alt_name if self.event is None else self.event
+        event = "{}_{}".format(action, name)
+        observable.trigger(event, *event_args)
+
+    deleter = _preserve_settings(property.deleter)
+    getter = _preserve_settings(property.getter)
+    setter = _preserve_settings(property.setter)
+
+    @classmethod
+    def create_with(
+            cls, event: str = None, observable: T.Union[str, Observable] = None
+    ) -> T.Callable[..., "ObservableProperty"]:
+        """Creates a partial application of ObservableProperty with
+        event and observable preset."""
+
+        return functools.partial(cls, event=event, observable=observable)
