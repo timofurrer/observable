@@ -12,13 +12,15 @@ from .core import Observable
 __all__ = ["ObservableProperty"]
 
 
-def _preserve_settings(func: T.Callable) -> T.Callable:
+def _preserve_settings(method: T.Callable) -> T.Callable:
     """Decorator that ensures ObservableProperty-specific attributes
     are kept when using methods to change deleter, getter or setter."""
 
-    @functools.wraps(func)
-    def _wrapper(old: "ObservableProperty", handler: T.Callable) -> "ObservableProperty":
-        new = func(old, handler)
+    @functools.wraps(method)
+    def _wrapper(
+            old: "ObservableProperty", handler: T.Callable
+    ) -> "ObservableProperty":
+        new = method(old, handler)
         new.event = old.event
         new.observable = old.observable
         return new
@@ -111,7 +113,11 @@ class ObservableProperty(property):
     def _trigger_event(
             self, holder: T.Any, alt_name: str, action: str, *event_args: T.Any
     ) -> None:
-        """Triggers an event on the associated Observable object."""
+        """Triggers an event on the associated Observable object.
+        The Holder is the object this property is a member of, alt_name
+        is used as the event name when self.event is not set, action is
+        prepended to the event name and event_args are passed through
+        to the registered event handlers."""
 
         if isinstance(self.observable, Observable):
             observable = self.observable
