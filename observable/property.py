@@ -44,13 +44,11 @@ class ObservableProperty(property):
     will only be created at object initialization and thus isn't there
     when defining the property.
 
-    The following events are triggered:
-    * "get_<name>"(value): Triggered whenever the property's value
-      is retrieved.
-    * "set_<name>"(value): Triggered after the property's value has
-      been set.
-    * "del_<name>"(): Triggered before the property is deleted.
-    * "deleted_<name>"(): Triggered after the property deletion finished.
+    The following events, of which "after_set_<name>" is probably the
+    one used most, are triggered:
+    * "before_get_<name>"() and "after_get_<name>"(value)
+    * "before_set_<name>"(value) and "after_set_<name>"(value)
+    * "before_del_<name>"() and "after_del_<name>"()
 
     <name> has to be replaced with the property's name. Note that names
     are taken from the individual functions supplied as getter, setter
@@ -58,29 +56,39 @@ class ObservableProperty(property):
     Alternatively, the name can be overwritten by specifying the name
     keyword argument when initializing the ObservableProperty.
 
-    The convenience helper ObservableProperty.create_with() can be
-    used as a decorator for creating ObservableProperty objects with
-    event and observable set. It returns a functools.partial() with the
-    chosen attributes.
+    The convenience helper ObservableProperty.create_with() can be used
+    as a decorator for creating ObservableProperty objects with custom
+    event and/or observable. It returns a functools.partial() with the
+    chosen attributes pre-set.
 
-    Here's an example for using the event and observable keyword arguments:
+    Here's an example for using the event and observable keyword
+    arguments:
 
-        >>> import functools
         >>> from observable import Observable
         >>> from observable.property import ObservableProperty
         >>> class MyObject:
         ...     def __init__(self):
-        ...         self.obs = Observable()
-        ...         self._prop = 42
-        ...     @ObservableProperty.create_with(event="my_prop", observable="obs")
+        ...         self.events = Observable()
+        ...         self._value = 10
+        ...     @ObservableProperty.create_with(event="prop", observable="events")
         ...     def some_obscure_name(self):
-        ...         return self._prop
+        ...         return self._value
+        ...     @some_obscure_name.setter
+        ...     def some_obscure_name(self, value):
+        ...         self._value += value
         ...
         >>> obj = MyObject()
-        >>> obj.obs.on("get_my_prop", functools.partial(print, "Got value"))
+        >>> obj.obs.on("after_get_prop", lambda v: print("got", v))
+        >>> obj.obs.on("before_set_prop",
+        ...            lambda v: print("setting", obs.some_obscure_name, v))
+        >>> obj.obs.on("after_set_prop", lambda v: print("set", v))
+        >>> obj.some_obscure_name = 32
+        got 10
+        setting 10 32
+        set 32
         >>> obj.some_obscure_name
-        Got value 42
-        >>>
+        got 42
+        42
     """
 
     def __init__(
@@ -89,26 +97,32 @@ class ObservableProperty(property):
             **kwargs: T.Any
     ) -> None:
         super().__init__(*args, **kwargs)
-
         self.event = event
         self.observable = observable
 
     def __delete__(self, instance: T.Any) -> None:
         if self.fdel is not None:
-            self._trigger_event(instance, self.fdel.__name__, "del")
+            self._trigger_event(instance, self.fdel.__name__, "before_del")
         super().__delete__(instance)
-        self._trigger_event(instance, self.fdel.__name__, "deleted")
+        self._trigger_event(instance, self.fdel.__name__, "after_del")
 
     def __get__(self, instance: T.Any, owner: T.Any = None) -> T.Any:
+        if instance is None:
+            return super().__get__(instance, owner)
+        if self.fget is not None:
+            self._trigger_event(instance, self.fget.__name__, "before_get")
         value = super().__get__(instance, owner)
         if instance is None:
             return value
-        self._trigger_event(instance, self.fget.__name__, "get", value)
+        self._trigger_event(instance, self.fget.__name__, "after_get", value)
         return value
 
     def __set__(self, instance: T.Any, value: T.Any) -> None:
+        if self.fset is not None:
+            self._trigger_event(instance, self.fset.__name__,
+                                "before_set", value)
         super().__set__(instance, value)
-        self._trigger_event(instance, self.fset.__name__, "set", value)
+        self._trigger_event(instance, self.fset.__name__, "after_set", value)
 
     def _trigger_event(
             self, holder: T.Any, alt_name: str, action: str, *event_args: T.Any
