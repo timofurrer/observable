@@ -5,9 +5,9 @@ from observable.property import ObservableProperty
 
 
 class _TestObject(Observable):
-    def __init__(self):
+    def __init__(self, initial_value):
         super().__init__()
-        self.value = 1
+        self.value = initial_value
 
     @ObservableProperty
     def prop(self):
@@ -23,7 +23,7 @@ class _TestObject(Observable):
 
 
 def _test_action(action):
-    obj = _TestObject()
+    obj = _TestObject(1)
 
     @obj.on("before_" + action + "_prop")
     def handle_before(*args):
