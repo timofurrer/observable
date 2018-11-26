@@ -127,7 +127,7 @@ Then you can do the following to inspect the registered handlers:
 ## Usage of ``observable.property.ObservableProperty``
 
 A property that can be observed easily by listening for some special,
-auto-generated events. It's API is identical to that of the build-in
+auto-generated events. Its API is identical to that of the build-in
 ``property``.
 
 The ``ObservableProperty`` needs an ``Observable`` object for
@@ -135,7 +135,7 @@ triggering events. If the property is an attribute of an object of
 type ``Observable``, that one will be used automatically. To specify a
 different ``Observable`` object, pass it as the ``observable`` keyword
 argument when initializing the ``ObservableProperty``. You may also pass
-a string for ``observable``, it's then looked for an attribute of that
+a string for ``observable``, which looks for an attribute of that
 name in the containing object. This is useful to specify the name of an
 attribute which will only be created at object initialization and thus
 isn't there when defining the property.
