@@ -1,4 +1,5 @@
 # observable
+
 [![Build Status](https://travis-ci.com/timofurrer/observable.svg?branch=master)](https://travis-ci.com/timofurrer/observable)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
@@ -23,7 +24,11 @@ def do_time_travel():
         obs.trigger("error", "Time travel to 1291 didn't work")
 ```
 
+An ``ObservableProperty`` type is included as well, which makes observing
+object properties a breeze.
+
 **Note:** We are Python 3 only! Only Python Versions >= 3.5 are supported. Use [v0.3.2](https://pypi.org/project/observable/0.3.2/) for older Python Versions.
+
 
 ## How to use
 
@@ -39,7 +44,8 @@ from observable import Observable
 obs = Observable()
 ```
 
-## Usage
+
+## Usage of ``observable.Observable``
 
 ### `on`: Register event handler with `on`
 There are two ways to register a function to an event.<br />
@@ -116,6 +122,73 @@ Then you can do the following to inspect the registered handlers:
 >>> obs.get_handlers("other_event")
 []
 ```
+
+
+## Usage of ``observable.property.ObservableProperty``
+
+A property that can be observed easily by listening for some special,
+auto-generated events. Its API is identical to that of the build-in
+``property``.
+
+The ``ObservableProperty`` needs an ``Observable`` object for
+triggering events. If the property is an attribute of an object of
+type ``Observable``, that one will be used automatically. To specify a
+different ``Observable`` object, pass it as the ``observable`` keyword
+argument when initializing the ``ObservableProperty``. You may also pass
+a string for ``observable``, which looks for an attribute of that
+name in the containing object. This is useful to specify the name of an
+attribute which will only be created at object initialization and thus
+isn't there when defining the property.
+
+The following events, of which ``"after_set_<name>"`` is probably the
+one used most, are triggered:
+
+* ``"before_get_<name>"()`` and ``"after_get_<name>"(value)``
+* ``"before_set_<name>"(value)`` and ``"after_set_<name>"(value)``
+* ``"before_del_<name>"()`` and ``"after_del_<name>"()``
+
+``<name>`` has to be replaced with the property's name. Note that names
+are taken from the individual functions supplied as getter, setter and
+deleter, so please name those functions like the property itself.
+Alternatively, the name to use can be specified with the ``name``
+keyword argument when initializing the ObservableProperty.
+
+The convenience helper ``ObservableProperty.create_with()`` can be used
+as a decorator for creating ``ObservableProperty`` objects with custom
+``event`` and/or ``observable``. It returns a ``functools.partial()``
+with the chosen attributes pre-set.
+
+Here's an example for using the ``event`` and ``observable`` keyword
+arguments:
+
+```python
+>>> from observable import Observable
+>>> from observable.property import ObservableProperty
+>>> class MyObject:
+...     def __init__(self):
+...         self.events = Observable()
+...         self._value = 10
+...     @ObservableProperty.create_with(event="prop", observable="events")
+...     def some_obscure_name(self):
+...         return self._value
+...     @some_obscure_name.setter
+...     def some_obscure_name(self, value):
+...         self._value += value
+...
+>>> obj = MyObject()
+>>> obj.obs.on("after_get_prop", lambda v: print("got", v))
+>>> obj.obs.on("before_set_prop",
+...            lambda v: print("setting", obs.some_obscure_name, v))
+>>> obj.obs.on("after_set_prop", lambda v: print("set", v))
+>>> obj.some_obscure_name = 32
+got 10
+setting 10 32
+set 32
+>>> obj.some_obscure_name
+got 42
+42
+```
+
 
 ***
 

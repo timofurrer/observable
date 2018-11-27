@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
     Event system for python
 """
@@ -32,7 +30,7 @@ class EventNotFound(Exception):
         return "Event {} wasn't found".format(self.event)
 
 
-class Observable(object):
+class Observable:
     """Event system for python"""
 
     def __init__(self) -> None:
@@ -58,9 +56,9 @@ class Observable(object):
 
         return handler in self._events.get(event, [])
 
-    def on(
-        self, event: str, *handlers: T.Callable
-    ) -> T.Callable:  # pylint: disable=invalid-name
+    def on(  # pylint: disable=invalid-name
+            self, event: str, *handlers: T.Callable
+    ) -> T.Callable:
         """Registers one or more handlers to a specified event.
         This method may as well be used as a decorator for the handler."""
 
@@ -73,9 +71,9 @@ class Observable(object):
             return _on_wrapper(*handlers)
         return _on_wrapper
 
-    def off(
-        self, event: str = None, *handlers: T.Callable
-    ) -> None:  # pylint: disable=keyword-arg-before-vararg
+    def off(  # pylint: disable=keyword-arg-before-vararg
+            self, event: str = None, *handlers: T.Callable
+    ) -> None:
         """Unregisters a whole event (if no handlers are given) or one
         or more handlers from an event.
         Raises EventNotFound when the given event isn't registered.
