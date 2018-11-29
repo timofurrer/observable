@@ -20,7 +20,7 @@ def _preserve_settings(method: T.Callable) -> T.Callable:
     def _wrapper(
             old: "ObservableProperty", handler: T.Callable
     ) -> "ObservableProperty":
-        new = method(old, handler)
+        new = method(old, handler)  # type: ObservableProperty
         new.event = old.event
         new.observable = old.observable
         return new
